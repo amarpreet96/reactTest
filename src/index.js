@@ -1,12 +1,48 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import * as serviceWorker from './serviceWorker';
+import Commenting from './comment';
+import Season from './season';
+import Spinner from './spinner';
 
-ReactDOM.render(<App />, document.getElementById('root'));
+/*const App = () => {
+	window.navigator.geolocation.getCurrentPosition(
+		(position) => console.log(position),
+		(err)=> console.log(err)
+	);
+	return (
+	  <div className="ui container comments">
+	  
+			<Commenting author="api" />
+			<Season />
+		 <div className = "ui container comments">
+			<Commenting author= "catalyst" />
+		 </div>
+	 </div>
+	);
+};*/
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();
+class App extends React.Component{
+
+	state={lat:null , long:null, errorMessage:''};
+	componentDidMount(){
+		window.navigator.geolocation.getCurrentPosition(
+			position => this.setState({lat:position.coords.latitude, long:position.coords.longitude}),
+			error => this.setState({errorMessage: error.message})
+		);
+	}
+
+	
+	render(){
+		if( this.state.errorMessage && !this.state.lat){
+			return <div>Error : {this.state.errorMessage}</div>;
+		}
+		if( !this.state.errorMessage && this.state.lat){
+			//return <div>Latitude : {this.state.lat}</div>;
+			return <Season lat={this.state.lat} />
+		}
+
+		return <Spinner message="Please Grant Access To Get Your Location" />;
+	}
+}
+
+ReactDOM.render(<App />, document.querySelector('#root'));
